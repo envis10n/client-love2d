@@ -26,7 +26,7 @@ function love.load()
 	socket:settimeout(0)
 
     state.registerEvents()
-    state.switch(state_menu)
+    state.switch(state_game)
 end
 
 function love.update()
