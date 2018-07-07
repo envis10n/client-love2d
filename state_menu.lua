@@ -3,7 +3,7 @@ state_menu = {}
 sel = 1
 options = {
 	"Log in",
-	"Register"
+	"[Register]"
 }
 
 function state_menu:enter()
