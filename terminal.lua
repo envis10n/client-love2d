@@ -52,8 +52,7 @@ function terminal:init()
 	terminal.input = ""
 	terminal.input_active = true
 
-	terminal:add("¬rt¬*e¬gs¬*t¬ri¬*n¬bg¬*")
-	terminal:add("¬rline¬* ¬g#¬*¬b2¬*")
+	terminal:add("¬g[¬*SUCCESS¬g]¬* System initialised. Terminal interface online.")
 end
 
 function terminal:prompt()
@@ -77,7 +76,6 @@ function terminal:draw()
 		for i, ch in pairs(ls) do
 			if (ch == "¬" and terminal.codes[ls[i+1]]) then
 				local col = terminal.codes[ls[i+1]]
-				print(col[1], col[2], col[3])
 				love.graphics.setColor(col[1], col[2], col[3])
 
 				ls[i] = nil
@@ -92,21 +90,44 @@ function terminal:draw()
 	love.graphics.setColor(0, 255, 0)
 
 	if (terminal.input_active) then
-		love.graphics.print(">>", 10, h-fonth*1.75)
+		love.graphics.print(">>"..terminal.input, 10, h-fonth*1.75)
 	end
 end
 
 function terminal:add(text)
 	local s = ""
 	for ch in text:gmatch(".") do
-		if (#s+1 >= w/fontw) then
+		if (#s+1 >= w/fontw-1 or ch == "\n") then
 			terminal.lines[#terminal.lines+1] = s
 			s = ""
 		end
-		s = s..ch
+		if not (ch == "\n") then
+			s = s..ch
+		end
 	end
 	if (#s > 0) then
 		terminal.lines[#terminal.lines+1] = s
+	end
+end
+
+function terminal:textinput(key)
+	if (terminal.input_active) then
+		terminal.input = terminal.input..key
+	end
+end
+
+function terminal:keypress(key, scancode, isrepeat)
+	if (terminal.input_active) then
+		if (key == "return") then
+			if (#terminal.input > 0) then
+				terminal:add(">>"..terminal.input)
+				send('{"request":"command", "cmd":"'..terminal.input..'"}')
+				terminal.input = ""
+			end
+		end
+		if (key == "backspace") then
+			terminal.input = string.sub(terminal.input, 0, string.len(terminal.input)-1)
+		end
 	end
 end
 

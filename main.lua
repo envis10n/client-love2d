@@ -1,4 +1,5 @@
 socket = require("socket").tcp()
+json = require("json/json")
 
 font = love.graphics.newFont("OCR-A.ttf", 20)
 fontw = font:getWidth("_")
@@ -31,7 +32,7 @@ function love.load()
 	socket:settimeout(0)
 
     state.registerEvents()
-    state.switch(state_game)
+    state.switch(state_menu)
 end
 
 function love.update()
@@ -47,5 +48,20 @@ function love.update()
 	end
 	if (#data > 0) then
 		print(data)
+		data = json.decode(data)
+
+		if (data.token) then
+			state_game.token = data.token
+			state.switch(state_game)
+		end
+
+		if (terminal) then
+			if (data.msg) then
+				terminal:add(data.msg)
+			end
+			if (data.error) then
+				terminal:add("¬r[¬*¬RERROR¬*¬r]¬* ¬r"..data.error.."¬*")
+			end
+		end
 	end
 end
