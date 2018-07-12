@@ -105,6 +105,57 @@ function terminal:add(text)
 	end
 end
 
+function terminal:getselected()
+	local sp = terminal.selp
+
+	if not (sp) then
+		return ""
+	end
+
+	local rmx = lib:round(mx, fontw)+1
+	local rmy = lib:round(my, fonth)+1
+	
+	if (sp.x > rmx) then
+		terminal.selp = nil
+		return
+	end
+	if (sp.y > rmy) then
+		terminal.selp = nil
+		return
+	end
+
+	local dx = math.floor(sp.x/fontw)
+	local dy = math.floor(sp.y/fonth)
+
+	local rh = math.floor((h-fonth*2)/fonth)
+
+	local rl = math.floor((rmy-sp.y)/fonth)-1
+	local rt = math.floor((rmx-sp.x)/fontw)-1
+	
+	local s = ""
+	local y = #terminal.lines-(rh-dy)
+	for y = y, y+rl do
+		if (#s > 0) then
+			s = s.."\n"
+		end
+
+		local ln = terminal.lines[y+1]
+		if (ln) then
+			ln = lib:split(lib:strip_cols(ln))
+
+			for x = dx, dx+rt do
+				if (x > 0 and ln[x]) then
+					s = s..ln[x]
+				end
+			end
+		else
+			s = s.."\n"
+		end
+	end
+	
+	return s
+end
+
 function terminal:textinput(key)
 	if (terminal.input_active) then
 		terminal.input = terminal.input..key
@@ -112,16 +163,30 @@ function terminal:textinput(key)
 end
 
 function terminal:keypress(key, scancode, isrepeat)
-	if (terminal.input_active) then
-		if (key == "return") then
-			if (#terminal.input > 0) then
-				terminal:add(">>"..terminal.input)
-				send('{"request":"command", "cmd":"'..terminal.input..'"}')
-				terminal.input = ""
+	if (love.keyboard.isDown("lctrl")) then
+		if (key == "c") then
+			local sel = terminal:getselected()
+			if (sel and #sel > 0) then
+				love.system.setClipboardText(sel)
+			end
+		elseif (key == "v" and terminal.input_active) then
+			local clip = love.system.getClipboardText()
+			if (clip) then
+				terminal.input = terminal.input..clip
 			end
 		end
-		if (key == "backspace") then
-			terminal.input = string.sub(terminal.input, 0, string.len(terminal.input)-1)
+	else	
+		if (terminal.input_active) then
+			if (key == "return") then
+				if (#terminal.input > 0) then
+					terminal:add(">>"..terminal.input)
+					send('{"request":"command", "cmd":"'..terminal.input..'"}')
+					terminal.input = ""
+				end
+			end
+			if (key == "backspace") then
+				terminal.input = string.sub(terminal.input, 0, string.len(terminal.input)-1)
+			end
 		end
 	end
 end
