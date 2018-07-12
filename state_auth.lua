@@ -61,7 +61,7 @@ function state_auth:keypressed(key, scancode, isrepeat)
         if (inputting_to == "username") then
 			inputting_to = "password"
 		elseif (inputting_to == "password") then
-            send('{"request":"auth", "login":{"username":"'..username..'", "password":"'..password..'"}}')
+            send('{"request":"auth", "'..state_auth.ctx..'":{"username":"'..username..'", "password":"'..password..'"}}')
 		elseif (inputting_to == "return") then
 			state_auth.ctx = nil
 			state.switch(state_menu)

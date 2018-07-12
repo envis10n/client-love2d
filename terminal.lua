@@ -27,7 +27,7 @@ function terminal:init()
 	terminal.input = ""
 	terminal.input_active = true
 
-	--terminal:add("¬g[¬*SUCCESS¬g]¬* System initialised. Terminal interface online.")
+	terminal:add("¬g[¬*SUCCESS¬g]¬* System initialised. Terminal interface online.")
 	terminal:add("¬?test line #2 yes yes¬*")
 	terminal:add("lets add another line")
 	terminal:add("this is actually hell")
@@ -75,8 +75,11 @@ function terminal:draw()
 	local sp = terminal.selp
 	if (sp) then
 		local rmx = lib:round(mx, fontw)
-	local rmy = lib:round(my, fonth)
-		love.graphics.rectangle("fill", sp.x, sp.y, rmx-sp.x, rmy-sp.y)
+		local rmy = lib:round(my, fonth)
+
+		if (sp.x <= rmx and sp.y <= rmy) then
+			love.graphics.rectangle("fill", sp.x, sp.y, rmx-sp.x, rmy-sp.y)
+		end
 	end
 
 	love.graphics.setColor(0, 1, 0)
