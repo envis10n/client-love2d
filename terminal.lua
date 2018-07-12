@@ -27,6 +27,8 @@ function terminal:init()
 	terminal.input = ""
 	terminal.input_active = true
 
+	terminal.scrolln = 0
+
 	terminal:add("¬g[¬*SUCCESS¬g]¬* System initialised. Terminal interface online.")
 end
 
@@ -42,27 +44,30 @@ function terminal:draw()
 	if (v > h/fonth) then
 		v = h/fonth
 	end
+	v = v+terminal.scrolln
 
-	for i = 1, v do
+	for i = terminal.scrolln+1, v do
 		local x = 10
-		local y = h-(i+2)*fonth
+		local y = (h-(i+2)*fonth)+(terminal.scrolln*fonth)
 
 		local l = terminal.lines[#terminal.lines-i+1]
-		local ls = lib:split(l)
-		for i, ch in pairs(ls) do
-			if (ch == "¬" and terminal.codes[ls[i+1]]) then
-				local col = terminal.codes[ls[i+1]]
-				local alp = 1
-				if (col[4]) then
-					alp = col[4]
-				end
-				love.graphics.setColor(col[1], col[2], col[3], alp)
+		if (l) then
+			local ls = lib:split(l)
+			for i, ch in pairs(ls) do
+				if (ch == "¬" and terminal.codes[ls[i+1]]) then
+					local col = terminal.codes[ls[i+1]]
+					local alp = 1
+					if (col[4]) then
+						alp = col[4]
+					end
+					love.graphics.setColor(col[1], col[2], col[3], alp)
 
-				ls[i] = nil
-				ls[i+1] = nil
-			else
-				love.graphics.print(ch, x, y)
-				x = x + fontw
+					ls[i] = nil
+					ls[i+1] = nil
+				else
+					love.graphics.print(ch, x, y)
+					x = x + fontw
+				end
 			end
 		end
 	end
@@ -136,7 +141,8 @@ function terminal:getselected()
 			s = s.."\n"
 		end
 
-		local ln = terminal.lines[y+1]
+		print(y+1-terminal.scrolln)
+		local ln = terminal.lines[y+1-terminal.scrolln]
 		if (ln) then
 			ln = lib:split(lib:strip_cols(ln))
 
@@ -191,6 +197,12 @@ function terminal:keypress(key, scancode, isrepeat)
 				terminal.input = string.sub(terminal.input, 0, string.len(terminal.input)-1)
 			end
 		end
+	end
+end
+
+function terminal:scroll(amn)
+	if (terminal.scrolln+amn >= 0 and terminal.scrolln+amn <= #terminal.lines) then
+		terminal.scrolln = terminal.scrolln+amn
 	end
 end
 

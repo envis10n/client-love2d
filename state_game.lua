@@ -34,4 +34,8 @@ function state_game:mousereleased(x, y, button)
 	terminal.selp = nil
 end
 
+function state_game:wheelmoved(x, y)
+	terminal:scroll(y)
+end
+
 return state_game
