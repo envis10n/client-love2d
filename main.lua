@@ -5,6 +5,8 @@ font = love.graphics.newFont("OCR-A.ttf", 20)
 fontw = font:getWidth("_")
 fonth = font:getHeight("_")
 
+lib = require("lib")
+
 state = require("hump/gamestate")
 
 terminal = require("terminal")

@@ -2,32 +2,6 @@ utf8 = require("utf8")
 
 local terminal = {}
 
-function split(str)
-	local r = {}
-
-	for i = 1, #str do
-		table.insert(r, utf8.offset(str, i))
-	end
-
-	for i = 1, #r do
-		local t = r[i+1]
-		if (t) then
-			t = t-1
-		else
-			t = r[i]+1
-		end
-		
-		local v = string.sub(str, r[i], t)
-		if (#v > 0) then
-			r[i] = v
-		else
-			r[i] = nil
-		end
-	end
-
-	return r
-end
-
 terminal.codes = {
 	["w"] = {1, 1, 1},
 	["W"] = {0.8, 0.8, 0.8},
@@ -43,7 +17,8 @@ terminal.codes = {
 	["p"] = {1, 0.53, 1},
 	["V"] = {0.54, 0.16, 0.88},
 	["v"] = {0.39, 0.32, 0.58},
-	["*"] = {0, 1, 0}
+	["*"] = {0, 1, 0},
+	["?"] = {0.91, 0.24, 0.47, 0.9}
 }
 
 function terminal:init()
@@ -52,13 +27,17 @@ function terminal:init()
 	terminal.input = ""
 	terminal.input_active = true
 
-	terminal:add("¬g[¬*SUCCESS¬g]¬* System initialised. Terminal interface online.")
+	--terminal:add("¬g[¬*SUCCESS¬g]¬* System initialised. Terminal interface online.")
+	terminal:add("¬?test line #2 yes yes¬*")
+	terminal:add("lets add another line")
+	terminal:add("this is actually hell")
 end
 
 function terminal:prompt()
 end
 
 function terminal:update()
+	mx, my = love.mouse.getPosition()
 end
 
 function terminal:draw()
@@ -72,11 +51,15 @@ function terminal:draw()
 		local y = h-(i+2)*fonth
 
 		local l = terminal.lines[#terminal.lines-i+1]
-		local ls = split(l)
+		local ls = lib:split(l)
 		for i, ch in pairs(ls) do
 			if (ch == "¬" and terminal.codes[ls[i+1]]) then
 				local col = terminal.codes[ls[i+1]]
-				love.graphics.setColor(col[1], col[2], col[3])
+				local alp = 1
+				if (col[4]) then
+					alp = col[4]
+				end
+				love.graphics.setColor(col[1], col[2], col[3], alp)
 
 				ls[i] = nil
 				ls[i+1] = nil
@@ -87,7 +70,16 @@ function terminal:draw()
 		end
 	end
 
-	love.graphics.setColor(0, 255, 0)
+	love.graphics.setColor(0.25, 1, 0.25, 0.25)
+
+	local sp = terminal.selp
+	if (sp) then
+		local rmx = lib:round(mx, fontw)
+	local rmy = lib:round(my, fonth)
+		love.graphics.rectangle("fill", sp.x, sp.y, rmx-sp.x, rmy-sp.y)
+	end
+
+	love.graphics.setColor(0, 1, 0)
 
 	if (terminal.input_active) then
 		love.graphics.print(">>"..terminal.input, 10, h-fonth*1.75)
