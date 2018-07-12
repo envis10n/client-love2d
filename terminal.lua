@@ -28,9 +28,6 @@ function terminal:init()
 	terminal.input_active = true
 
 	terminal:add("¬g[¬*SUCCESS¬g]¬* System initialised. Terminal interface online.")
-	terminal:add("¬?test line #2 yes yes¬*")
-	terminal:add("lets add another line")
-	terminal:add("this is actually hell")
 end
 
 function terminal:prompt()
@@ -180,7 +177,13 @@ function terminal:keypress(key, scancode, isrepeat)
 			if (key == "return") then
 				if (#terminal.input > 0) then
 					terminal:add(">>"..terminal.input)
-					send('{"request":"command", "cmd":"'..terminal.input..'"}')
+
+					if (terminal.input == "clear") then
+						terminal.lines = {}
+					else
+						send('{"request":"command", "cmd":"'..terminal.input..'"}')
+					end
+
 					terminal.input = ""
 				end
 			end
