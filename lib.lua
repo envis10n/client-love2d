@@ -47,4 +47,8 @@ function lib:round(i, n)
 	return i+n/2 - (i+n/2) % n
 end
 
+function lib:startsWith(s, w)
+	return s:sub(1, #w) == w
+end
+
 return lib

@@ -7,14 +7,19 @@ function state_auth:enter()
 	inputting_to = "username"
 	username = ""
 	password = ""
+
+	msg = ""
+	if (state_auth.ctx == "login") then
+		msg = "Authentication required to proceed"
+	elseif (state_auth.ctx == "register") then
+		msg = "Processing user registration"
+	else
+		msg = "Error -- why am I here?"
+	end
 end
 
 function state_auth:draw()
-	if (state_auth.ctx == "login") then
-		love.graphics.print("Authentication required to proceed", 20, 20)
-	elseif (state_auth.ctx == "register") then
-		love.graphics.print("Processing user registration", 20, 20)
-	end
+	love.graphics.print(msg, 20, 20)
 
     local u = "Username: "..username
     if (inputting_to == "username") then

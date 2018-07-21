@@ -4,10 +4,14 @@ json = require("json/json")
 font = love.graphics.newFont("OCR-A.ttf", 20)
 fontw = font:getWidth("_")
 fonth = font:getHeight("_")
+fallback = love.graphics.newFont("Noto.ttf", 20)
+font:setFallbacks(fallback)
 
 lib = require("lib")
 
 state = require("hump/gamestate")
+
+soundtrack = require("soundtrack")
 
 terminal = require("terminal")
 
@@ -34,30 +38,37 @@ function love.load()
 	socket:settimeout(0)
 
     state.registerEvents()
-    state.switch(state_menu)
+	state.switch(state_menu)
 end
 
 function love.update()
 	local receiving = true
 	local data = ""
-	while (receiving) do
-		local chunk = socket:receive("*l")
-		if (chunk) then
-			data = data..chunk
-		else
-			receiving = false
-		end
-	end
-	if (#data > 0) then
+	
+
+	local data = socket:receive("*l")
+	if not (data == nil) and (#data > 0) then
 		print(data)
 		data = json.decode(data)
 
-		if (data.token) then
-			state_game.token = data.token
-			state.switch(state_game)
+		local gs = state:current()
+
+		if (data.cfg) then
+			if not (data.cfg.vol == nil) then
+				print("vol: "..tostring(data.cfg.vol))
+				soundtrack:setVol(data.cfg.vol);
+			end
 		end
 
-		if (terminal) then
+		if (gs == state_auth) then
+			if (data.token) then
+				state_game.token = data.token
+				state.switch(state_game)
+			end
+			if (data.error) then
+				msg = data.error
+			end
+		elseif (gs == state_game) then
 			if (data.msg) then
 				terminal:add(data.msg)
 			end

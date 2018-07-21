@@ -4,11 +4,18 @@ function state_game:enter()
 	terminal = require("terminal")
 	terminal:init()
 
+	soundtrack:init()
+
 	send('{"request":"connect", "token":"'..state_game.token..'"}')
+end
+
+function state_game:leave()
+	soundtrack:stop()
 end
 
 function state_game:update()
 	terminal:update()
+	soundtrack:update()
 end
 
 function state_game:draw()
