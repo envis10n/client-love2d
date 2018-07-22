@@ -10,6 +10,10 @@ function soundtrack:init()
 	soundtrack.tracks.breach_loop = love.audio.newSource("sound/misuse_of_information_technology_loop.wav", "stream")
 	soundtrack.tracks.breach_loop:setLooping(true)
 
+	if (soundtrack.vol == nil) then
+		soundtrack.vol = 3
+	end
+
 	soundtrack:play("peace")
 end
 
@@ -19,16 +23,16 @@ function soundtrack:stop()
 	end
 end
 
-function soundtrack:play(track, vol)
+function soundtrack:play(track)
 	soundtrack:stop()
-	soundtrack.tracks[track]:setVolume(soundtrack.vol or vol or 0.4)
+	soundtrack.tracks[track]:setVolume(soundtrack.vol)
 	soundtrack.tracks[track]:play()
 	soundtrack.track = track
 end
 
 function soundtrack:setVol(vol)
+	soundtrack.vol = vol
 	if (soundtrack.track) then
-		soundtrack.vol = vol
 		soundtrack.tracks[soundtrack.track]:setVolume(soundtrack.vol)
 	end
 end
@@ -38,7 +42,7 @@ function soundtrack:update()
 	if (track == "breach") then
 		if not (soundtrack.tracks[track]:isPlaying()) then
 			soundtrack:stop()
-			soundtrack:play("breach_loop", soundtrack.tracks[track]:getVolume())
+			soundtrack:play("breach_loop")
 		end
 	end
 end

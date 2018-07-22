@@ -37,7 +37,7 @@ function terminal:init()
 	terminal.bufferln = 1
 	terminal.bufferix = 1
 
-	terminal:add("¬g[¬*SUCCESS¬g]¬* System initialised. Terminal interface online.")
+	terminal:add("¬g[¬*SUCCESS¬g]¬* Conenction to the net established.")
 end
 
 function terminal:prompt()
@@ -257,6 +257,8 @@ function terminal:keypress(key, scancode, isrepeat)
 					terminal.input = ""
 
 					terminal.hix = -1
+				elseif (terminal.input == "") then
+					terminal.bufferln = #terminal.lines+1
 				end
 			elseif (key == "backspace") then
 				terminal.input = string.sub(terminal.input, 0, string.len(terminal.input)-1)

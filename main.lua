@@ -55,8 +55,8 @@ function love.update()
 
 		if (data.cfg) then
 			if not (data.cfg.vol == nil) then
-				print("vol: "..tostring(data.cfg.vol))
-				soundtrack:setVol(data.cfg.vol);
+				print("vol: "..tostring(data.cfg.vol/10))
+				soundtrack:setVol(data.cfg.vol/10);
 			end
 		end
 
