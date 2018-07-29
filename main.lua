@@ -39,6 +39,8 @@ function love.load()
 
     state.registerEvents()
 	state.switch(state_menu)
+
+	love.keyboard.setKeyRepeat(true)
 end
 
 function love.update()
