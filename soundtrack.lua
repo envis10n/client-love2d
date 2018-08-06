@@ -3,8 +3,8 @@ local soundtrack = {}
 function soundtrack:init()
 	soundtrack.tracks = {}
 
-	soundtrack.tracks.peace = love.audio.newSource("sound/disturbance_of_data_security.ogg", "stream")
-	soundtrack.tracks.peace:setLooping(true)
+	soundtrack.tracks.peace = love.audio.newSource("sound/peaceful.wav", "stream")
+	soundtrack.tracks.peace2 = love.audio.newSource("sound/disturbance_of_data_security.ogg", "stream")
 
 	soundtrack.tracks.breach = love.audio.newSource("sound/misuse_of_information_technology.wav", "stream")
 	soundtrack.tracks.breach_loop = love.audio.newSource("sound/misuse_of_information_technology_loop.wav", "stream")
@@ -39,10 +39,15 @@ end
 
 function soundtrack:update()
 	local track = soundtrack.track
-	if (track == "breach") then
-		if not (soundtrack.tracks[track]:isPlaying()) then
-			soundtrack:stop()
+	if not (soundtrack.tracks[track]:isPlaying()) then
+		soundtrack:stop()
+
+		if (track == "breach") then
 			soundtrack:play("breach_loop")
+		elseif (track == "peace") then
+			soundtrack:play("peace2")
+		elseif (track == "peace2") then
+			soundtrack:play("peace")
 		end
 	end
 end
