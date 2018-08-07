@@ -71,6 +71,14 @@ function love.update()
 				msg = data.error
 			end
 		elseif (gs == state_game) then
+			if (data.panic) then
+				soundtrack:stop()
+				soundtrack:play("breach")
+			elseif (data.panicEnd) then
+				soundtrack:stop()
+				soundtrack:play("peace2")
+			end
+
 			if (data.msg) then
 				terminal:add(data.msg)
 			end

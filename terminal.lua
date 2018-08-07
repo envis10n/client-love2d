@@ -37,7 +37,7 @@ function terminal:init()
 	terminal.bufferln = 1
 	terminal.bufferix = 1
 
-	terminal:add("¬g[¬*SUCCESS¬g]¬* Conenction to the net established.")
+	terminal:add("¬g[¬*SUCCESS¬g]¬* Connection to the net established.")
 end
 
 function terminal:prompt()
