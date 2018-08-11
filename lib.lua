@@ -26,6 +26,14 @@ function lib:split(str)
 	return r
 end
 
+function lib:join(tbl)
+	local r = ""
+	for i, v in pairs(tbl) do
+		r = r..v
+	end
+	return r
+end
+
 function lib:strip_cols(str)
 	local r = ""
 	local ls = lib:split(str)

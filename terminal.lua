@@ -117,18 +117,17 @@ function terminal:draw()
 	end
 
 	local sp = terminal.selp
+	love.graphics.setColor(0.25, 1, 0.25, 0.25)
+	love.graphics.rectangle("fill", 10+(#lib:split(terminal.input)*fontw)+fontw*2, h-fonth*1.75, 10, fonth)
 	if (sp) then
-		love.graphics.setColor(0.25, 1, 0.25, 0.25)
-
 		local rmx = lib:round(mx, fontw)
 		local rmy = lib:round(my, fonth)
 
 		if (sp.x <= rmx and sp.y <= rmy) then
 			love.graphics.rectangle("fill", sp.x, sp.y, rmx-sp.x, rmy-sp.y)
 		end
-
-		love.graphics.setColor(0, 1, 0)
 	end
+	love.graphics.setColor(0, 1, 0)
 
 	if (terminal.input_active) then
 		love.graphics.print(">>"..terminal.input, 10, h-fonth*1.75)
@@ -261,7 +260,9 @@ function terminal:keypress(key, scancode, isrepeat)
 					terminal.bufferln = #terminal.lines+1
 				end
 			elseif (key == "backspace") then
-				terminal.input = string.sub(terminal.input, 0, string.len(terminal.input)-1)
+				local r = lib:split(terminal.input)
+				table.remove(r, #r)
+				terminal.input = lib:join(r)
 			end
 		end
 	end
