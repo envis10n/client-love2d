@@ -34,7 +34,7 @@ function love.load()
     love.graphics.setFont(font)
 	love.graphics.setColor(0, 255, 0)
 	
-	socket:connect("209.97.136.54", 13373)
+	socket:connect("::", 13373)
 	socket:settimeout(0)
 
     state.registerEvents()
