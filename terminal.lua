@@ -29,6 +29,8 @@ function terminal:init()
 	terminal.input = ""
 	terminal.input_active = true
 
+	terminal.cpos = 0
+
 	terminal.scrolln = 0
 
 	terminal.history = {}
@@ -56,7 +58,7 @@ function terminal:update()
 			end
 			terminal.bufferix = terminal.bufferix+inc
 		else
-			terminal.bufferln = terminal.bufferln+2
+			terminal.bufferln = terminal.bufferln+1
 			terminal.bufferix = 1
 		end
 	end
@@ -118,7 +120,7 @@ function terminal:draw()
 
 	local sp = terminal.selp
 	love.graphics.setColor(0.25, 1, 0.25, 0.25)
-	love.graphics.rectangle("fill", 10+(#lib:split(terminal.input)*fontw)+fontw*2, h-fonth*1.75, 10, fonth)
+	love.graphics.rectangle("fill", 10+(terminal.cpos*fontw)+fontw*2, h-fonth*1.75, 10, fonth)
 	if (sp) then
 		local rmx = lib:round(mx, fontw)
 		local rmy = lib:round(my, fonth)
@@ -203,7 +205,8 @@ end
 
 function terminal:textinput(key)
 	if (terminal.input_active) then
-		terminal.input = terminal.input..key
+		terminal.input = string.sub(terminal.input, 0, terminal.cpos)..key..string.sub(terminal.input, terminal.cpos+1)
+		terminal.cpos = terminal.cpos+1
 	end
 end
 
@@ -237,8 +240,19 @@ function terminal:keypress(key, scancode, isrepeat)
 					terminal.input = ""
 					terminal.hix = -1
 				end
+			elseif (key == "left") then
+				terminal.cpos = terminal.cpos-1
+				if (terminal.cpos < 0) then
+					terminal.cpos = 0
+				end
+			elseif (key == "right") then
+				terminal.cpos = terminal.cpos+1
+				if (terminal.cpos > #terminal.input) then
+					terminal.cpos = #terminal.input
+				end
 			elseif (key == "return") then
 				if (#terminal.input > 0) then
+					terminal.cpos = 0
 					terminal:add(">>"..terminal.input)
 
 					if (terminal.input == "clear") then
@@ -248,7 +262,7 @@ function terminal:keypress(key, scancode, isrepeat)
 					elseif (terminal.input == ".ost_breach") then
 						soundtrack:play("breach", 0.8)
 					else
-						send('{"request":"command", "cmd":"'..terminal.input..'"}')
+						send('{"request":"command", "cmd":"'..lib:escape(terminal.input)..'"}')
 					end
 
 					table.insert(terminal.history, terminal.input)

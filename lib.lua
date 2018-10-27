@@ -59,4 +59,8 @@ function lib:startsWith(s, w)
 	return s:sub(1, #w) == w
 end
 
+function lib:escape(s)
+	return s:gsub("\\", "\\\\"):gsub("\"", "\\\"")
+end
+
 return lib
