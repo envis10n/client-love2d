@@ -277,6 +277,7 @@ function terminal:keypress(key, scancode, isrepeat)
 				local r = lib:split(terminal.input)
 				table.remove(r, #r)
 				terminal.input = lib:join(r)
+				terminal.cpos = terminal.cpos-1
 			end
 		end
 	end
