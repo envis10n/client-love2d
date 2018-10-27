@@ -240,6 +240,7 @@ function terminal:keypress(key, scancode, isrepeat)
 					terminal.input = ""
 					terminal.hix = -1
 				end
+				terminal.cpos = #terminal.input
 			elseif (key == "left") then
 				terminal.cpos = terminal.cpos-1
 				if (terminal.cpos < 0) then
@@ -275,7 +276,7 @@ function terminal:keypress(key, scancode, isrepeat)
 				end
 			elseif (key == "backspace") then
 				local r = lib:split(terminal.input)
-				table.remove(r, #r)
+				table.remove(r, terminal.cpos)
 				terminal.input = lib:join(r)
 				terminal.cpos = terminal.cpos-1
 			end
