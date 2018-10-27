@@ -203,10 +203,14 @@ function terminal:getselected()
 	return s
 end
 
+function terminal:in_insert(str)
+	terminal.input = lib:slice(terminal.input, 1, terminal.cpos)..str..lib:slice(terminal.input, terminal.cpos+1)
+	terminal.cpos = terminal.cpos+1
+end
+
 function terminal:textinput(key)
 	if (terminal.input_active) then
-		terminal.input = string.sub(terminal.input, 0, terminal.cpos)..key..string.sub(terminal.input, terminal.cpos+1)
-		terminal.cpos = terminal.cpos+1
+		terminal:in_insert(key)
 	end
 end
 
@@ -220,7 +224,7 @@ function terminal:keypress(key, scancode, isrepeat)
 		elseif (key == "v" and terminal.input_active) then
 			local clip = love.system.getClipboardText()
 			if (clip) then
-				terminal.input = terminal.input..clip
+				terminal:in_insert(clip)
 			end
 		end
 	else	
@@ -240,7 +244,7 @@ function terminal:keypress(key, scancode, isrepeat)
 					terminal.input = ""
 					terminal.hix = -1
 				end
-				terminal.cpos = #terminal.input
+				terminal.cpos = #lib:split(terminal.input)
 			elseif (key == "left") then
 				terminal.cpos = terminal.cpos-1
 				if (terminal.cpos < 0) then
@@ -249,7 +253,7 @@ function terminal:keypress(key, scancode, isrepeat)
 			elseif (key == "right") then
 				terminal.cpos = terminal.cpos+1
 				if (terminal.cpos > #terminal.input) then
-					terminal.cpos = #terminal.input
+					terminal.cpos = #lib:split(terminal.input)
 				end
 			elseif (key == "return") then
 				if (#terminal.input > 0) then

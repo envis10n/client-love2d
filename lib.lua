@@ -34,6 +34,21 @@ function lib:join(tbl)
 	return r
 end
 
+function lib:slice(str, s, e)
+	local r = lib:split(str)
+
+	b = s or 0
+	e = e or #r
+
+	local s = ""
+	for i = b, e do
+		local c = r[i]
+		if (not c) then break end
+		s = s..c
+	end
+	return s
+end
+
 function lib:strip_cols(str)
 	local r = ""
 	local ls = lib:split(str)
