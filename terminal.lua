@@ -111,7 +111,6 @@ function terminal:draw()
 					ls[i] = nil
 					ls[i+1] = nil
 				else
-					print(i, ch)
 					love.graphics.print(ch, x, y)
 					x = x + fontw
 				end
