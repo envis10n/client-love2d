@@ -97,6 +97,8 @@ function terminal:draw()
 		local l = buffer[#buffer-i+1]
 		if (l) then
 			local ls = lib:split(l)
+
+			local lpi = 0
 			for i, ch in pairs(ls) do
 				if (ch == "¬" and terminal.codes[ls[i+1]]) then
 					local col = terminal.codes[ls[i+1]]
@@ -109,6 +111,7 @@ function terminal:draw()
 					ls[i] = nil
 					ls[i+1] = nil
 				else
+					print(i, ch)
 					love.graphics.print(ch, x, y)
 					x = x + fontw
 				end
@@ -138,8 +141,9 @@ end
 
 function terminal:add(text)
 	local s = ""
-	for ch in text:gmatch(".") do
-		if (#s+1 >= w/fontw-1 or ch == "\n") then
+	local split = lib:split(text)
+	for i, ch in pairs(split) do
+		if (#lib:split(s)+1 >= w/fontw-1 or ch == "\n") then
 			terminal.lines[#terminal.lines+1] = s
 			s = ""
 		end
@@ -205,7 +209,7 @@ end
 
 function terminal:in_insert(str)
 	terminal.input = lib:slice(terminal.input, 1, terminal.cpos)..str..lib:slice(terminal.input, terminal.cpos+1)
-	terminal.cpos = terminal.cpos+1
+	terminal.cpos = terminal.cpos+#lib:split(str)
 end
 
 function terminal:textinput(key)
@@ -283,6 +287,13 @@ function terminal:keypress(key, scancode, isrepeat)
 				table.remove(r, terminal.cpos)
 				terminal.input = lib:join(r)
 				terminal.cpos = terminal.cpos-1
+				if (terminal.cpos < 0) then
+					terminal.cpos = 0
+				end
+			elseif (key == "delete") then
+				local r = lib:split(terminal.input)
+				table.remove(r, terminal.cpos+1)
+				terminal.input = lib:join(r)
 			end
 		end
 	end

@@ -88,3 +88,9 @@ function love.update()
 		end
 	end
 end
+
+function love.resize(nw, nh)
+	print("window has been resized")
+	w = nw
+	h = nh
+ end

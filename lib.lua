@@ -1,26 +1,21 @@
 lib = {}
 
 function lib:split(str)
-	local r = {}
+	local n = {}
 
-	for i = 1, #str do
-		table.insert(r, utf8.offset(str, i))
+	while (#str > 0) do
+		local off = utf8.offset(str, -1)
+		if (off) then
+			ch = string.sub(str, off, #str)
+			str = string.sub(str, 1, off-1)
+			table.insert(n, ch)
+		end
 	end
 
-	for i = 1, #r do
-		local t = r[i+1]
-		if (t) then
-			t = t-1
-		else
-			t = r[i]+1
-		end
-		
-		local v = string.sub(str, r[i], t)
-		if (#v > 0) then
-			r[i] = v
-		else
-			r[i] = nil
-		end
+	local r = {}
+
+	for i, v in pairs(n) do
+		r[1+#n-i] = v
 	end
 
 	return r
