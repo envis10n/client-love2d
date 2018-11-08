@@ -31,8 +31,8 @@ end
 
 function state_game:mousepressed(x, y, button)
 	terminal.selp = {
-		x = lib:round(x-fontw/2, fontw),
-		y = lib:round(y-fonth/2, fonth)
+		x = x,
+		y = y
 	}
 end
 function state_game:mousereleased(x, y, button)

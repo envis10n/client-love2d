@@ -1,9 +1,11 @@
 state_menu = {}
 
-sel = 1
-options = {
+local sel = 1
+local options = {
 	"Log in",
-	"Register"
+	"Register",
+	"Settings",
+	"Exit"
 }
 
 function state_menu:enter()
@@ -24,7 +26,7 @@ function state_menu:draw()
 
 		love.graphics.print(str, 20, ix)
 
-		ix = ix+20
+		ix = ix+fonth
 	end
 end
 
@@ -38,6 +40,10 @@ function state_menu:keypressed(key, scancode, isrepeat)
 		elseif (option == "Register") then
 			state_auth.ctx = "register"
 			state.switch(state_auth)
+		elseif (option == "Settings") then
+			state.switch(state_cfg)
+		elseif (option == "Exit") then
+			love.event.quit()
 		end
     end
 

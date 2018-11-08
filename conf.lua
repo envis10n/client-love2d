@@ -1,5 +1,7 @@
+json = require("json/json")
+
 function love.conf(t)
+	t.identity = "Intercept"
 	t.window.title = "Intercept"
-    t.window.width = 1400
-    t.window.height = 800
+	t.window.resizable = true
 end

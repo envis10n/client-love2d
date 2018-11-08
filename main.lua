@@ -17,6 +17,7 @@ terminal = require("terminal")
 
 state_menu = require("state_menu")
 state_auth = require("state_auth")
+state_cfg = require("state_cfg")
 state_game = require("state_game")
 
 local socket = require("socket").tcp()
@@ -26,7 +27,38 @@ function send(data)
 	socket:send(data)
 end
 
+function icfg()
+	local flags = {
+		fullscreen = cfg.fullscreen
+	}
+
+	love.window.setMode(cfg.width, cfg.height, flags)
+
+	w, h = love.graphics.getDimensions()
+end
+
 function love.load()
+	local exists = love.filesystem.getInfo("config.txt")
+	local file = love.filesystem.newFile("config.txt")
+	if (exists) then
+		file:open("r")
+		local r = file:read()
+		cfg = json.decode(r)
+
+		icfg()
+	else
+		print("creating file")
+		file:open("w")
+		cfg = {
+			width = 1152,
+			height = 768,
+			borderless = false,
+			fullscreen = false
+		}
+		file:write(json.encode(cfg))
+	end
+	file:close()
+
 	w, h = love.graphics.getDimensions()
 
     love.graphics.setBackgroundColor(0.02, 0.03, 0.03)
@@ -47,7 +79,6 @@ function love.update()
 	local receiving = true
 	local data = ""
 	
-
 	local data = socket:receive("*l")
 	if not (data == nil) and (#data > 0) then
 		print(data)
@@ -65,6 +96,7 @@ function love.update()
 		if (gs == state_auth) then
 			if (data.token) then
 				state_game.token = data.token
+				--state_game.token = "alonelygirl"
 				state.switch(state_game)
 			end
 			if (data.error) then

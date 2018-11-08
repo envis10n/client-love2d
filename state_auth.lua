@@ -54,6 +54,17 @@ function state_auth:textinput(key)
 end
 
 function state_auth:keypressed(key, scancode, isrepeat)
+	if (love.keyboard.isDown("lctrl") and key == "v") then
+		local clip = love.system.getClipboardText()
+		if (clip) then
+			if (inputting_to == "username") then
+				username = username..clip
+			else
+				password = password..clip
+			end
+		end
+	end
+
     if (key == "backspace") then
         if (inputting_to == "username") then
 			username = string.sub(username, 0, string.len(username)-1)

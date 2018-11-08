@@ -39,6 +39,8 @@ function terminal:init()
 	terminal.bufferln = 1
 	terminal.bufferix = 1
 
+	love.mouse.setVisible(false)
+
 	terminal:add("¬g[¬*SUCCESS¬g]¬* Connection to the net established.")
 end
 
@@ -120,16 +122,22 @@ function terminal:draw()
 		love.graphics.setColor(0, 1, 0)
 	end
 
-	local sp = terminal.selp
 	love.graphics.setColor(0.25, 1, 0.25, 0.25)
 	love.graphics.rectangle("fill", 10+(terminal.cpos*fontw)+fontw*2, h-fonth*1.75, 10, fonth)
-	if (sp) then
-		local rmx = lib:round(mx, fontw)
-		local rmy = lib:round(my, fonth)
 
-		if (sp.x <= rmx and sp.y <= rmy) then
-			love.graphics.rectangle("fill", sp.x, sp.y, rmx-sp.x, rmy-sp.y)
+	local sp = terminal.selp
+	local rmx = lib:round(mx, fontw)
+	local rmy = lib:round(my, fonth)
+	local my = math.floor((h-lib:round(rmy, fonth))/fonth)
+	if (sp) then
+		local y = math.floor((h-lib:round(sp.y, fonth))/fonth)
+		local rx = lib:round(sp.x, fontw)
+		local ry = lib:round(sp.y, h-(y*fonth))
+		if (my <= y) then
+			love.graphics.rectangle("fill", rx, ry, rmx-rx, fonth+fonth*(y-my))
 		end
+	else
+		love.graphics.rectangle("fill", rmx, h-(fonth*my), fontw, fonth)
 	end
 	love.graphics.setColor(0, 1, 0)
 
@@ -162,44 +170,23 @@ function terminal:getselected()
 		return ""
 	end
 
-	local rmx = lib:round(mx, fontw)+1
-	local rmy = lib:round(my, fonth)+1
+	local sp = terminal.selp
 	
-	if (sp.x > rmx) then
-		terminal.selp = nil
-		return
-	end
-	if (sp.y > rmy) then
-		terminal.selp = nil
-		return
-	end
+	local rx = lib:round(sp.x, fontw)
+	local rmx = lib:round(mx, fontw)
 
-	local dx = math.floor(sp.x/fontw)
-	local dy = math.floor(sp.y/fonth)
+	local y = math.floor((h-lib:round(sp.y, fonth))/fonth)
+	local tmy = math.floor((h-lib:round(lib:round(my, fonth), fonth))/fonth)
 
-	local rh = math.floor((h-fonth*2)/fonth)
-
-	local rl = math.floor((rmy-sp.y)/fonth)-1
-	local rt = math.floor((rmx-sp.x)/fontw)-1
-	
 	local s = ""
-	local y = #terminal.lines-(rh-dy)
-	for y = y, y+rl do
-		if (#s > 0) then
+
+	for i = 0, y-tmy do
+		if (i >= 1) then
 			s = s.."\n"
 		end
-
-		local ln = terminal.lines[y+1-terminal.scrolln]
-		if (ln) then
-			ln = lib:split(lib:strip_cols(ln))
-
-			for x = dx, dx+rt do
-				if (x > 0 and ln[x]) then
-					s = s..ln[x]
-				end
-			end
-		else
-			s = s.."\n"
+		local l = terminal.lines[#terminal.lines-terminal.scrolln-(y-3)+i]
+		if (l) then
+			s = s..lib:slice(lib:strip_cols(l), rx/fontw, rmx/fontw-1)
 		end
 	end
 	
@@ -267,6 +254,8 @@ function terminal:keypress(key, scancode, isrepeat)
 						terminal.bufferln = 1
 						terminal.bufferix = 1
 						terminal.lines = {}
+					elseif (terminal.input == "menu") then
+						state.switch(state_menu)
 					elseif (terminal.input == ".ost_breach") then
 						soundtrack:play("breach", 0.8)
 					else
