@@ -75,19 +75,15 @@ function love.load()
 	love.keyboard.setKeyRepeat(true)
 end
 
-buffer = ""
-
 function love.update()
 	local receiving = true
 	
 	local dstr = love.thread.getChannel('data'):pop()
 	if not (dstr == nil) and (#dstr > 0) then
-		print(data)
-		buffer = buffer .. dstr
+		print(dstr)
 
-		data = json.decode(buffer)
+		data = json.decode(dstr)
 		if not (data == nil) then
-			buffer = ""
 
 			local gs = state:current()
 

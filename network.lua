@@ -8,7 +8,7 @@ while true do
     if not (data == nil) and (#data > 0) then
         buffer = buffer .. data
     else
-        if (data == nil) and (#buffer > 0) then
+        if (string.sub(buffer, #buffer-1, #buffer) == "}\n") then
             love.thread.getChannel('data'):push(buffer)
             buffer = ""
         end
