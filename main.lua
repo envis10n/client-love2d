@@ -1,5 +1,4 @@
-socket = require("socket").tcp()
-json = require("json/json")
+json = require("dkjson/dkjson")
 
 font = love.graphics.newFont("OCR-A.ttf", 20)
 fontw = font:getWidth("_")
@@ -20,11 +19,11 @@ state_auth = require("state_auth")
 state_cfg = require("state_cfg")
 state_game = require("state_game")
 
-local socket = require("socket").tcp()
+local networkThread
 
 function send(data)
 	print("Sending data")
-	socket:send(data)
+	love.thread.getChannel('send'):push(data)
 end
 
 function icfg()
@@ -66,8 +65,9 @@ function love.load()
     love.graphics.setFont(font)
 	love.graphics.setColor(0, 255, 0)
 	
-	socket:connect("209.97.136.54", 13373)
-	socket:settimeout(0)
+	networkThread = love.thread.newThread("network.lua")
+
+	networkThread:start()
 
     state.registerEvents()
 	state.switch(state_menu)
@@ -75,47 +75,53 @@ function love.load()
 	love.keyboard.setKeyRepeat(true)
 end
 
+buffer = ""
+
 function love.update()
 	local receiving = true
-	local data = ""
 	
-	local data = socket:receive("*l")
-	if not (data == nil) and (#data > 0) then
+	local dstr = love.thread.getChannel('data'):pop()
+	if not (dstr == nil) and (#dstr > 0) then
 		print(data)
-		data = json.decode(data)
+		buffer = buffer .. dstr
 
-		local gs = state:current()
+		data = json.decode(buffer)
+		if not (data == nil) then
+			buffer = ""
 
-		if (data.cfg) then
-			if not (data.cfg.vol == nil) then
-				print("vol: "..tostring(data.cfg.vol/10))
-				soundtrack:setVol(data.cfg.vol/10);
-			end
-		end
+			local gs = state:current()
 
-		if (gs == state_auth) then
-			if (data.token) then
-				state_game.token = data.token
-				--state_game.token = "alonelygirl"
-				state.switch(state_game)
-			end
-			if (data.error) then
-				msg = data.error
-			end
-		elseif (gs == state_game) then
-			if (data.panic) then
-				soundtrack:stop()
-				soundtrack:play("breach")
-			elseif (data.panicEnd) then
-				soundtrack:stop()
-				soundtrack:play("peace2")
+			if (data.cfg) then
+				if not (data.cfg.vol == nil) then
+					print("vol: "..tostring(data.cfg.vol/10))
+					soundtrack:setVol(data.cfg.vol/10);
+				end
 			end
 
-			if (data.msg) then
-				terminal:add(data.msg)
-			end
-			if (data.error) then
-				terminal:add("¬r[¬*¬RERROR¬*¬r]¬* ¬r"..data.error.."¬*")
+			if (gs == state_auth) then
+				if (data.token) then
+					state_game.token = data.token
+					--state_game.token = "alonelygirl"
+					state.switch(state_game)
+				end
+				if (data.error) then
+					msg = data.error
+				end
+			elseif (gs == state_game) then
+				if (data.panic) then
+					soundtrack:stop()
+					soundtrack:play("breach")
+				elseif (data.panicEnd) then
+					soundtrack:stop()
+					soundtrack:play("peace2")
+				end
+
+				if (data.msg) then
+					terminal:add(data.msg)
+				end
+				if (data.error) then
+					terminal:add("¬r[¬*¬RERROR¬*¬r]¬* ¬r"..data.error.."¬*")
+				end
 			end
 		end
 	end
