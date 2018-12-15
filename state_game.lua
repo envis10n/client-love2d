@@ -1,8 +1,10 @@
 state_game = {}
+terminal = require("terminal")
 
 function state_game:enter()
-	terminal = require("terminal")
-	terminal:init()
+	if (not terminal.active) then
+		terminal:init()
+	end
 
 	soundtrack:init()
 
