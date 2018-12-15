@@ -1,6 +1,6 @@
 local socket = require("socket").tcp()
 local buffer = ""
-socket:connect("209.97.136.54", 13373)
+socket:connect("::", 13373) -- 209.97.136.54
 socket:settimeout(0)
 while true do
     local data = ""

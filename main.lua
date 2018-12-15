@@ -97,7 +97,6 @@ function love.update()
 			if (gs == state_auth) then
 				if (data.token) then
 					state_game.token = data.token
-					--state_game.token = "alonelygirl"
 					state.switch(state_game)
 				end
 				if (data.error) then
