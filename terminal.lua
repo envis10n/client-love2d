@@ -271,6 +271,8 @@ function terminal:keypress(key, scancode, isrepeat)
 					terminal.input = ""
 
 					terminal.hix = -1
+
+					terminal.scrolln = 0
 				elseif (terminal.input == "") then
 					terminal.bufferln = #terminal.lines+1
 				end
