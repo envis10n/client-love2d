@@ -1,7 +1,12 @@
 state_game = {}
 terminal = require("terminal")
 
+local postprocess = require("post")
+
 function state_game:enter()
+	effect = postprocess()
+
+	
 	if (not terminal.active) then
 		terminal:init()
 	end
@@ -21,7 +26,10 @@ function state_game:update()
 end
 
 function state_game:draw()
-	terminal:draw()
+	effect(function()
+		love.graphics.setColor(0, 255, 0);
+		terminal:draw()
+	end)
 end
 
 function state_game:textinput(key)

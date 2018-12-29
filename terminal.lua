@@ -95,7 +95,6 @@ function terminal:draw()
 		v = h/fonth
 	end
 	v = v+terminal.scrolln
-
 	for i = terminal.scrolln+1, v do
 		local x = 10
 		local y = (h-(i+2)*fonth)+(terminal.scrolln*fonth)
@@ -125,7 +124,6 @@ function terminal:draw()
 
 		love.graphics.setColor(0, 1, 0)
 	end
-
 	love.graphics.setColor(0.25, 1, 0.25, 0.25)
 	love.graphics.rectangle("fill", 10+(terminal.cpos*fontw)+fontw*2, h-fonth*1.75, 10, fonth)
 
@@ -271,8 +269,6 @@ function terminal:keypress(key, scancode, isrepeat)
 					terminal.input = ""
 
 					terminal.hix = -1
-
-					terminal.scrolln = 0
 				elseif (terminal.input == "") then
 					terminal.bufferln = #terminal.lines+1
 				end

@@ -1,6 +1,9 @@
 state_auth = {}
 
+local postprocess = require("post")
+
 function state_auth:enter()
+	effect = postprocess()
 	print("Entering authentication screen")
 	print("ctx:"..state_auth.ctx)
 
@@ -19,30 +22,35 @@ function state_auth:enter()
 end
 
 function state_auth:draw()
-	love.graphics.print(msg, 20, 20)
+	effect(function()
 
-    local u = "Username: "..username
-    if (inputting_to == "username") then
-        u = u.."_"
-    end
-    love.graphics.print(u, 20, 60);
+		love.graphics.setColor(0, 255, 0);
 
-    local p = "Password: "
-    for i=1, string.len(password) do
-        p = p.."*"
-    end
-    if (inputting_to == "password") then
-        p = p.."_"
-    end
-	love.graphics.print(p, 20, 80)
-	
-	local rs = "Return to menu"
-	if (inputting_to == "return") then
-		rs = ">"..rs
-	else
-		rs = " "..rs
-	end
-	love.graphics.print(rs, 20, 120)
+		love.graphics.print(msg, 20, 20)
+
+		local u = "Username: "..username
+		if (inputting_to == "username") then
+			u = u.."_"
+		end
+		love.graphics.print(u, 20, 60);
+
+		local p = "Password: "
+		for i=1, string.len(password) do
+			p = p.."*"
+		end
+		if (inputting_to == "password") then
+			p = p.."_"
+		end
+		love.graphics.print(p, 20, 80)
+		
+		local rs = "Return to menu"
+		if (inputting_to == "return") then
+			rs = ">"..rs
+		else
+			rs = " "..rs
+		end
+		love.graphics.print(rs, 20, 120)
+	end)
 end
 
 function state_auth:textinput(key)

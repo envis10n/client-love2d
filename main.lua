@@ -1,5 +1,7 @@
 json = require("dkjson/dkjson")
 
+local postprocess = require("post")
+
 font = love.graphics.newFont("OCR-A.ttf", 20)
 fontw = font:getWidth("_")
 fonth = font:getHeight("_")
@@ -52,19 +54,29 @@ function love.load()
 			width = 1152,
 			height = 768,
 			borderless = false,
-			fullscreen = false
+			fullscreen = false,
+			effects = {
+				glow = false,
+				scanlines = false,
+				filmgrain = false,
+				crt = false
+			}
 		}
 		file:write(json.encode(cfg))
 	end
 	file:close()
 
-	w, h = love.graphics.getDimensions()
+	effect = postprocess()
 
-    love.graphics.setBackgroundColor(0.02, 0.03, 0.03)
+	effect(function()
+		w, h = love.graphics.getDimensions()
 
-    love.graphics.setFont(font)
-	love.graphics.setColor(0, 255, 0)
-	
+		love.graphics.setBackgroundColor(0.02, 0.03, 0.03)
+
+		love.graphics.setFont(font)
+
+		love.graphics.setColor(0, 255, 0)
+	end)
 	networkThread = love.thread.newThread("network.lua")
 
 	networkThread:start()

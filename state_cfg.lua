@@ -1,13 +1,19 @@
 state_cfg = {}
 
+local postprocess = require("post")
+
 local sel = 1
 local options = {
 	"Toggle Fullscreen",
 	"Dimensions",
+	"Effects",
 	"Back"
 }
 local ds = false
+local ef = false
 local last = love.timer.getTime()
+
+local effects = {}
 
 local resolutions = {
 	{900, 700},
@@ -50,57 +56,95 @@ function save()
 end
 
 function state_cfg:enter()
+	effect = postprocess()
+	effects = {
+		{'Glow', cfg.effects.glow},
+		{'Scanlines', cfg.effects.scanlines},
+		{'CRT', cfg.effects.crt},
+		{'Filmgrain', cfg.effects.filmgrain}
+	}
 	print("Entering config screen")
 end
 
 function state_cfg:draw()
-	love.graphics.print("Settings", 20, 20)
-	
-	local ix = 60
+	effect(function()
 
-	if (ds) then
-		love.graphics.print("Current: "..tostring(cfg.width).."x"..tostring(cfg.height), 20, ix)
+		love.graphics.setColor(0, 255, 0);
 
-		ix = ix+fonth
+		love.graphics.print("Settings", 20, 20)
+		
+		local ix = 60
 
-		for i, res in pairs(resolutions) do
-			if (i == ds) then
+		if (ds) then
+			love.graphics.print("Current: "..tostring(cfg.width).."x"..tostring(cfg.height), 20, ix)
+
+			ix = ix+fonth
+
+			for i, res in pairs(resolutions) do
+				if (i == ds) then
+					love.graphics.setColor(0.25, 1, 0.25, 0.25)
+					love.graphics.rectangle("fill", 20, ix, 200, fonth)
+					love.graphics.setColor(0, 1, 0)
+				end
+
+				love.graphics.print(tostring(res[1]).."x"..tostring(res[2]), 20, ix)
+
+				ix = ix+fonth
+			end
+
+			love.graphics.print("Back", 20, ix)
+			if (ds == #resolutions+1) then
 				love.graphics.setColor(0.25, 1, 0.25, 0.25)
 				love.graphics.rectangle("fill", 20, ix, 200, fonth)
 				love.graphics.setColor(0, 1, 0)
 			end
 
-			love.graphics.print(tostring(res[1]).."x"..tostring(res[2]), 20, ix)
+			if (cfg.fullscreen) then
+				love.graphics.setColor(1, 0, 0)
+				love.graphics.print("This setting is redundant in fullscreen mode.", 20, ix+fonth*2)
+				love.graphics.setColor(0, 1, 0)
+			end
+		elseif (ef) then
+
+			love.graphics.setColor(0, 255, 0);
 
 			ix = ix+fonth
-		end
 
-		love.graphics.print("Back", 20, ix)
-		if (ds == #resolutions+1) then
-			love.graphics.setColor(0.25, 1, 0.25, 0.25)
-			love.graphics.rectangle("fill", 20, ix, 200, fonth)
-			love.graphics.setColor(0, 1, 0)
-		end
-
-		if (cfg.fullscreen) then
-			love.graphics.setColor(1, 0, 0)
-			love.graphics.print("This setting is redundant in fullscreen mode.", 20, ix+fonth*2)
-			love.graphics.setColor(0, 1, 0)
-		end
-	else
-		for i, option in pairs(options) do
-			local str = option
-			if (sel == i) then
-				str = ">"..str
-			else
-				str = " "..str
+			for i, eff in pairs(effects) do
+				if(i == ef) then
+					love.graphics.setColor(0.25, 1, 0.25, 0.25)
+					love.graphics.rectangle("fill", 20, ix, 200, fonth)
+					love.graphics.setColor(0, 1, 0)
+				end
+				local enabled = ' Off'
+				if eff[2] then
+					enabled = ' On'
+				end
+				love.graphics.print(eff[1]..enabled, 20, ix)
+				ix = ix+fonth
 			end
 
-			love.graphics.print(str, 20, ix)
+			love.graphics.print("Back", 20, ix)
+			if (ef == #effects+1) then
+				love.graphics.setColor(0.25, 1, 0.25, 0.25)
+				love.graphics.rectangle("fill", 20, ix, 200, fonth)
+				love.graphics.setColor(0, 1, 0)
+			end
+		else
+			for i, option in pairs(options) do
+				local str = option
+				if (sel == i) then
+					str = ">"..str
+				else
+					str = " "..str
+				end
 
-			ix = ix+fonth
+				love.graphics.print(str, 20, ix)
+
+				ix = ix+fonth
+			end
 		end
-	end
+	end)
 end
 
 function state_cfg:keypressed(key, scancode, isrepeat)
@@ -127,6 +171,41 @@ function state_cfg:keypressed(key, scancode, isrepeat)
 		if (key == "down" and ds<#resolutions+1) then
 			ds = ds+1
 		end
+	elseif (ef) then
+		if (key == "return") then
+			if (ef == #effects+1) then
+				ef = false
+			else
+				local eff = effects[ef]
+				if (eff[1] == 'Glow') then
+					cfg.effects.glow = not cfg.effects.glow
+				elseif (eff[1] == 'Scanlines') then
+					cfg.effects.scanlines = not cfg.effects.scanlines
+				elseif (eff[1] == 'CRT') then
+					cfg.effects.crt = not cfg.effects.crt
+				elseif (eff[1] == 'Filmgrain') then
+					cfg.effects.filmgrain = not cfg.effects.filmgrain
+				else
+
+				end
+				effects = {
+					{'Glow', cfg.effects.glow},
+					{'Scanlines', cfg.effects.scanlines},
+					{'CRT', cfg.effects.crt},
+					{'Filmgrain', cfg.effects.filmgrain}
+				}
+				icfg()
+				save()
+				effect = postprocess()
+			end
+		end
+
+		if (key == "up" and ef>1) then
+			ef = ef-1
+		end
+		if (key == "down" and ef<#effects+1) then
+			ef = ef+1
+		end
 	else
 		if (key == "return") then
 			local option = options[sel]
@@ -138,6 +217,8 @@ function state_cfg:keypressed(key, scancode, isrepeat)
 				last = love.timer.getTime()
 			elseif (option == "Dimensions") then
 				ds = 1
+			elseif (option == 'Effects') then
+				ef = 1
 			elseif (option == "Back") then
 				state.switch(state_menu)
 			end

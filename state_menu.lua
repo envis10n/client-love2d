@@ -1,5 +1,7 @@
 state_menu = {}
 
+local postprocess = require("post")
+
 local sel = 1
 local options = {
 	"Log in",
@@ -9,25 +11,30 @@ local options = {
 }
 
 function state_menu:enter()
+	effect = postprocess()
 	print("Entering menu screen")
 end
 
 function state_menu:draw()
-	love.graphics.print("Displaying index", 20, 20)
+	effect(function()
+		love.graphics.setColor(0, 255, 0);
 
-	local ix = 60
-	for i, option in pairs(options) do
-		local str = option
-		if (sel == i) then
-			str = ">"..str
-		else
-			str = " "..str
+		love.graphics.print("Displaying index", 20, 20)
+
+		local ix = 60
+		for i, option in pairs(options) do
+			local str = option
+			if (sel == i) then
+				str = ">"..str
+			else
+				str = " "..str
+			end
+
+			love.graphics.print(str, 20, ix)
+
+			ix = ix+fonth
 		end
-
-		love.graphics.print(str, 20, ix)
-
-		ix = ix+fonth
-	end
+	end)
 end
 
 function state_menu:keypressed(key, scancode, isrepeat)
