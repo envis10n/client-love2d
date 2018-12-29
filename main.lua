@@ -45,7 +45,15 @@ function love.load()
 		file:open("r")
 		local r = file:read()
 		cfg = json.decode(r)
-
+		if (cfg.effects == nil) then
+			cfg.effects = {
+				glow = false,
+				scanlines = false,
+				filmgrain = false,
+				crt = false
+			}
+			file:write(json.encode(cfg))
+		end
 		icfg()
 	else
 		print("creating file")
